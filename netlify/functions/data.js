@@ -1,6 +1,7 @@
-const { getStore } = require("@netlify/blobs");
+const { getStore, connectLambda } = require("@netlify/blobs");
 
 exports.handler = async (event) => {
+  connectLambda(event);
   const store = getStore("magazzino");
 
   const headers = {

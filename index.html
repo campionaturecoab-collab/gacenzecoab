@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giacenze Celle — Ortofrutta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F7F5;
+    --panel: #FFFFFF;
+    --ink: #1F2E28;
+    --ink-soft: #5B6B63;
+    --leaf: #2F6B4F;
+    --leaf-dark: #234F3B;
+    --steel: #4A6670;
+    --steel-soft: #E4EBEC;
+    --amber: #C4622D;
+    --amber-soft: #FBE9DF;
+    --line: #DDE3DE;
+    --line-strong: #C4CDC6;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  h1,h2,h3{
+    font-family:'Archivo', sans-serif;
+    margin:0;
+  }
+  .app{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 24px 60px;
+  }
+  header.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:16px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .brand .logo{
+    width:54px;
+    height:54px;
+    object-fit:contain;
+    flex-shrink:0;
+  }
+  .app-footer{
+    margin-top:34px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+    font-size:12px;
+    color:var(--ink-soft);
+    text-align:center;
+    line-height:1.6;
+  }
+  .app-footer a{ color:var(--leaf-dark); }
+  header.top h1{
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+    color:var(--leaf-dark);
+  }
+  header.top .sub{
+    color:var(--ink-soft);
+    font-size:13px;
+    margin-top:4px;
+  }
+  .stats{
+    display:flex;
+    gap:22px;
+    text-align:right;
+  }
+  .stat .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:22px;
+    font-weight:500;
+    color:var(--ink);
+    display:block;
+  }
+  .stat .lbl{
+    font-size:11.5px;
+    color:var(--ink-soft);
+  }
+  .layout{
+    display:grid;
+    grid-template-columns:250px 1fr;
+    gap:22px;
+    align-items:start;
+  }
+  @media (max-width:800px){
+    .layout{grid-template-columns:1fr;}
+  }
+  .cells-col{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .cell-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:4px solid var(--steel);
+    padding:12px 14px;
+    cursor:pointer;
+    position:relative;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .cell-card:hover{ border-left-color:var(--leaf); }
+  .cell-card.active{
+    border-left-color:var(--leaf);
+    background:#F0F6F2;
+  }
+  .cell-card .name{
+    font-weight:600;
+    font-size:14.5px;
+  }
+  .cell-card .meta{
+    color:var(--ink-soft);
+    font-size:12px;
+    margin-top:3px;
+    display:flex;
+    justify-content:space-between;
+  }
+  .cell-card .meta .temp{
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .add-cell-btn{
+    margin-top:6px;
+    border:1px dashed var(--line-strong);
+    background:none;
+    color:var(--ink-soft);
+    padding:10px 14px;
+    cursor:pointer;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13px;
+    text-align:left;
+  }
+  .add-cell-btn:hover{
+    border-color:var(--leaf);
+    color:var(--leaf-dark);
+  }
+  .main-panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    min-height:400px;
+  }
+  .main-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 20px;
+    border-bottom:1px solid var(--line);
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .main-header h2{
+    font-size:19px;
+    color:var(--leaf-dark);
+  }
+  .main-header .cell-temp-edit{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:2px;
+    display:flex;
+    gap:6px;
+    align-items:center;
+  }
+  .main-header .cell-temp-edit input{
+    width:56px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    border:1px solid var(--line);
+    padding:2px 4px;
+    background:var(--steel-soft);
+  }
+  .icon-btn{
+    background:none;
+    border:1px solid var(--line-strong);
+    color:var(--ink-soft);
+    padding:6px 10px;
+    font-size:12.5px;
+    cursor:pointer;
+    font-family:'IBM Plex Sans', sans-serif;
+  }
+  .icon-btn:hover{ border-color:var(--amber); color:var(--amber); }
+  table{
+    width:100%;
+    border-collapse:collapse;
+  }
+  thead th{
+    text-align:left;
+    font-weight:500;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    padding:10px 16px;
+    border-bottom:1px solid var(--line);
+  }
+  tbody td{
+    padding:11px 16px;
+    border-bottom:1px solid var(--line);
+    font-size:13.5px;
+    vertical-align:middle;
+  }
+  tbody tr:hover{ background:#FAFBFA; }
+  td.qty{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:500;
+  }
+  .row-actions{
+    display:flex;
+    gap:6px;
+  }
+  .row-actions button{
+    border:none;
+    background:none;
+    cursor:pointer;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    padding:3px 6px;
+  }
+  .row-actions button:hover{ color:var(--leaf); }
+  .row-actions button.del:hover{ color:var(--amber); }
+  .low-stock td.qty{ color:var(--amber); }
+  .low-badge{
+    display:inline-block;
+    margin-left:8px;
+    font-size:10.5px;
+    background:var(--amber-soft);
+    color:var(--amber);
+    padding:1px 6px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .add-row-form{
+    display:flex;
+    gap:8px;
+    padding:14px 16px;
+    flex-wrap:wrap;
+    background:#FAFBFA;
+    border-top:1px solid var(--line);
+  }
+  .add-row-form input{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13px;
+    padding:7px 9px;
+    border:1px solid var(--line-strong);
+    background:var(--panel);
+  }
+  .add-row-form input[name=nome]{ flex:1.6; min-width:140px; }
+  .add-row-form input[name=quantita]{ width:80px; }
+  .add-row-form input[name=unita]{ width:60px; }
+  .add-row-form input[name=data]{ width:130px; }
+  .add-row-form input[name=note]{ flex:1; min-width:100px; }
+  .add-row-form button{
+    background:var(--leaf);
+    color:#fff;
+    border:none;
+    padding:8px 16px;
+    font-size:13px;
+    font-weight:500;
+    cursor:pointer;
+    font-family:'IBM Plex Sans', sans-serif;
+  }
+  .add-row-form button:hover{ background:var(--leaf-dark); }
+  .empty-state{
+    padding:60px 20px;
+    text-align:center;
+    color:var(--ink-soft);
+  }
+  .empty-state .big{
+    font-family:'Archivo', sans-serif;
+    font-size:17px;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .modal-bg{
+    position:fixed; inset:0;
+    background:rgba(31,46,40,0.35);
+    display:flex; align-items:center; justify-content:center;
+    z-index:20;
+  }
+  .modal{
+    background:var(--panel);
+    padding:22px;
+    width:300px;
+    border-top:4px solid var(--leaf);
+  }
+  .modal h3{ font-size:16px; margin-bottom:14px; }
+  .modal label{
+    display:block;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+    margin-top:10px;
+  }
+  .modal input{
+    width:100%;
+    padding:8px 9px;
+    border:1px solid var(--line-strong);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13.5px;
+  }
+  .modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:18px;
+  }
+  .modal-actions button{
+    padding:8px 14px;
+    font-size:13px;
+    border:none;
+    cursor:pointer;
+    font-family:'IBM Plex Sans', sans-serif;
+  }
+  .modal-actions .cancel{ background:none; color:var(--ink-soft); border:1px solid var(--line-strong); }
+  .modal-actions .confirm{ background:var(--leaf); color:#fff; }
+  .toast{
+    position:fixed;
+    bottom:20px; left:50%;
+    transform:translateX(-50%);
+    background:var(--ink);
+    color:#fff;
+    padding:9px 18px;
+    font-size:13px;
+    z-index:30;
+    opacity:0;
+    transition:opacity .25s ease;
+    pointer-events:none;
+  }
+  .toast.show{ opacity:1; }
+  .loading-msg{ padding:40px; text-align:center; color:var(--ink-soft); }
+  .note-txt{ color:var(--ink-soft); font-size:12.5px; }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="loading-msg">Caricamento giacenze…</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'magazzino-data';
+let state = null; // { cells: [{id,name,temp}], products: [{id,cellId,nome,quantita,unita,data,note}] }
+let activeCellId = null;
+let modal = null; // {type: 'newCell'|'editCell', ...}
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+async function loadState(){
+  try{
+    const res = await fetch('/api/data');
+    if(res.ok){
+      state = await res.json();
+    } else {
+      state = { cells: [], products: [] };
+    }
+  }catch(e){
+    state = { cells: [], products: [] };
+    showToast('Impossibile contattare il server. Dati non sincronizzati.');
+  }
+  if(state.cells.length && !activeCellId){
+    activeCellId = state.cells[0].id;
+  }
+  render();
+}
+
+async function saveState(){
+  try{
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state)
+    });
+    if(!res.ok){ showToast('Errore nel salvataggio. Riprova.'); }
+  }catch(e){
+    showToast('Errore nel salvataggio. Riprova.');
+  }
+}
+
+// Ricarica periodicamente per riflettere le modifiche fatte da altri utenti
+setInterval(async ()=>{
+  if(modal) return; // non interrompere se sto compilando un modulo
+  try{
+    const res = await fetch('/api/data');
+    if(res.ok){
+      const fresh = await res.json();
+      if(JSON.stringify(fresh) !== JSON.stringify(state)){
+        state = fresh;
+        if(state.cells.length && !state.cells.find(c=>c.id===activeCellId)){
+          activeCellId = state.cells[0].id;
+        }
+        render();
+      }
+    }
+  }catch(e){ /* silenzioso: riprova al prossimo giro */ }
+}, 4000);
+
+function showToast(msg){
+  let t = document.getElementById('toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id='toast';
+    t.className='toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function fmtDate(d){
+  if(!d) return '—';
+  const parts = d.split('-');
+  if(parts.length===3) return parts[2]+'/'+parts[1]+'/'+parts[0];
+  return d;
+}
+
+function render(){
+  const app = document.getElementById('app');
+  const totalProdotti = state.products.length;
+  const totalCelle = state.cells.length;
+
+  let html = '';
+  html += `<header class="top">
+    <div class="brand">
+      <img class="logo" src="coab-logo.jpg" alt="Logo COAB">
+      <div>
+        <h1>Giacenze Celle</h1>
+        <div class="sub">COAB — magazzino frigorifero ortofrutta, aggiornabile da tutti gli utenti</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="num">${totalCelle}</span><span class="lbl">celle</span></div>
+      <div class="stat"><span class="num">${totalProdotti}</span><span class="lbl">prodotti registrati</span></div>
+    </div>
+  </header>`;
+
+  html += `<div class="layout">`;
+
+  // sidebar
+  html += `<div class="cells-col">`;
+  state.cells.forEach(cell=>{
+    const count = state.products.filter(p=>p.cellId===cell.id).length;
+    const active = cell.id===activeCellId ? 'active' : '';
+    html += `<div class="cell-card ${active}" data-cellid="${cell.id}">
+      <div class="name">${escapeHtml(cell.name)}</div>
+      <div class="meta"><span>${count} prodott${count===1?'o':'i'}</span><span class="temp">${cell.temp!=='' && cell.temp!=null ? cell.temp+'°C' : '—'}</span></div>
+    </div>`;
+  });
+  html += `<button class="add-cell-btn" id="btnAddCell">+ Nuova cella</button>`;
+  html += `</div>`;
+
+  // main panel
+  html += `<div class="main-panel">`;
+  const cell = state.cells.find(c=>c.id===activeCellId);
+  if(!cell){
+    html += `<div class="empty-state">
+      <div class="big">Nessuna cella ancora creata</div>
+      <div>Aggiungi una cella frigorifera per iniziare a registrare le giacenze.</div>
+    </div>`;
+  } else {
+    const products = state.products.filter(p=>p.cellId===cell.id);
+    html += `<div class="main-header">
+      <div>
+        <h2>${escapeHtml(cell.name)}</h2>
+        <div class="cell-temp-edit">Temperatura: <input type="number" step="0.5" id="tempInput" value="${cell.temp!=null?cell.temp:''}" placeholder="°C"> °C</div>
+      </div>
+      <div class="row-actions">
+        <button class="icon-btn" id="btnEditCellName">Rinomina cella</button>
+        <button class="icon-btn" id="btnDeleteCell">Elimina cella</button>
+      </div>
+    </div>`;
+
+    if(products.length===0){
+      html += `<div class="empty-state">
+        <div class="big">Questa cella è vuota</div>
+        <div>Usa il modulo qui sotto per registrare il primo prodotto.</div>
+      </div>`;
+    } else {
+      html += `<table><thead><tr>
+        <th>Prodotto</th><th>Quantità</th><th>Unità</th><th>Data ingresso</th><th>Note</th><th></th>
+      </tr></thead><tbody>`;
+      products.slice().sort((a,b)=>a.nome.localeCompare(b.nome)).forEach(p=>{
+        const low = Number(p.quantita) > 0 && Number(p.quantita) <= 5;
+        html += `<tr class="${low?'low-stock':''}" data-pid="${p.id}">
+          <td>${escapeHtml(p.nome)}</td>
+          <td class="qty">${p.quantita}${low?'<span class="low-badge">bassa</span>':''}</td>
+          <td>${escapeHtml(p.unita||'—')}</td>
+          <td>${fmtDate(p.data)}</td>
+          <td class="note-txt">${escapeHtml(p.note||'—')}</td>
+          <td><div class="row-actions">
+            <button class="editProd" title="Modifica quantità">Modifica</button>
+            <button class="delProd del" title="Rimuovi">Rimuovi</button>
+          </div></td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+    }
+
+    html += `<form class="add-row-form" id="addProdForm">
+      <input type="text" name="nome" placeholder="Prodotto (es. Mele Fuji)" required>
+      <input type="number" name="quantita" placeholder="Q.tà" step="0.1" required>
+      <input type="text" name="unita" placeholder="Unità (kg, casse)" value="kg">
+      <input type="date" name="data" value="${new Date().toISOString().slice(0,10)}">
+      <input type="text" name="note" placeholder="Note (lotto, fornitore…)">
+      <button type="submit">Aggiungi</button>
+    </form>`;
+  }
+  html += `</div>`; // main-panel
+  html += `</div>`; // layout
+
+  html += `<footer class="app-footer">
+    COAB — Cooperativa Ortofrutticola ed Agrumaria Bruzia, Società Cooperativa Agricola · Corigliano-Rossano (CS), Calabria<br>
+    Oltre 500 agricoltori soci · <a href="https://coab.it" target="_blank" rel="noopener">coab.it</a>
+  </footer>`;
+
+  if(modal){
+    html += renderModal();
+  }
+
+  app.innerHTML = html;
+  attachEvents();
+}
+
+function escapeHtml(s){
+  if(s==null) return '';
+  return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function renderModal(){
+  if(modal.type==='newCell'){
+    return `<div class="modal-bg" id="modalBg"><div class="modal">
+      <h3>Nuova cella frigorifera</h3>
+      <label>Nome cella</label>
+      <input type="text" id="modalName" placeholder="es. Cella 3 — Frutta">
+      <label>Temperatura (°C)</label>
+      <input type="number" step="0.5" id="modalTemp" placeholder="es. 4">
+      <div class="modal-actions">
+        <button class="cancel" id="modalCancel">Annulla</button>
+        <button class="confirm" id="modalConfirm">Crea cella</button>
+      </div>
+    </div></div>`;
+  }
+  if(modal.type==='renameCell'){
+    return `<div class="modal-bg" id="modalBg"><div class="modal">
+      <h3>Rinomina cella</h3>
+      <label>Nome cella</label>
+      <input type="text" id="modalName" value="${escapeHtml(modal.currentName)}">
+      <div class="modal-actions">
+        <button class="cancel" id="modalCancel">Annulla</button>
+        <button class="confirm" id="modalConfirm">Salva</button>
+      </div>
+    </div></div>`;
+  }
+  if(modal.type==='editQty'){
+    return `<div class="modal-bg" id="modalBg"><div class="modal">
+      <h3>Modifica quantità</h3>
+      <label>Prodotto</label>
+      <input type="text" id="modalName" value="${escapeHtml(modal.nome)}" disabled>
+      <label>Quantità</label>
+      <input type="number" step="0.1" id="modalQty" value="${modal.quantita}">
+      <div class="modal-actions">
+        <button class="cancel" id="modalCancel">Annulla</button>
+        <button class="confirm" id="modalConfirm">Salva</button>
+      </div>
+    </div></div>`;
+  }
+  return '';
+}
+
+function attachEvents(){
+  document.querySelectorAll('.cell-card').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      activeCellId = el.dataset.cellid;
+      render();
+    });
+  });
+
+  const btnAddCell = document.getElementById('btnAddCell');
+  if(btnAddCell) btnAddCell.addEventListener('click', ()=>{
+    modal = {type:'newCell'};
+    render();
+  });
+
+  const btnEditName = document.getElementById('btnEditCellName');
+  if(btnEditName) btnEditName.addEventListener('click', ()=>{
+    const cell = state.cells.find(c=>c.id===activeCellId);
+    modal = {type:'renameCell', currentName: cell.name};
+    render();
+  });
+
+  const btnDeleteCell = document.getElementById('btnDeleteCell');
+  if(btnDeleteCell) btnDeleteCell.addEventListener('click', async ()=>{
+    const cell = state.cells.find(c=>c.id===activeCellId);
+    if(!cell) return;
+    if(!confirm(`Eliminare la cella "${cell.name}" e tutti i suoi prodotti?`)) return;
+    state.cells = state.cells.filter(c=>c.id!==activeCellId);
+    state.products = state.products.filter(p=>p.cellId!==activeCellId);
+    activeCellId = state.cells.length ? state.cells[0].id : null;
+    await saveState();
+    render();
+    showToast('Cella eliminata');
+  });
+
+  const tempInput = document.getElementById('tempInput');
+  if(tempInput) tempInput.addEventListener('change', async (e)=>{
+    const cell = state.cells.find(c=>c.id===activeCellId);
+    cell.temp = e.target.value === '' ? null : Number(e.target.value);
+    await saveState();
+    render();
+  });
+
+  const addProdForm = document.getElementById('addProdForm');
+  if(addProdForm) addProdForm.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const fd = new FormData(addProdForm);
+    const nome = fd.get('nome').trim();
+    const quantita = fd.get('quantita');
+    if(!nome || quantita===''){ return; }
+    state.products.push({
+      id: uid(),
+      cellId: activeCellId,
+      nome,
+      quantita: Number(quantita),
+      unita: fd.get('unita').trim(),
+      data: fd.get('data'),
+      note: fd.get('note').trim()
+    });
+    await saveState();
+    render();
+    showToast('Prodotto aggiunto');
+  });
+
+  document.querySelectorAll('.delProd').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      const tr = e.target.closest('tr');
+      const pid = tr.dataset.pid;
+      const prod = state.products.find(p=>p.id===pid);
+      if(!confirm(`Rimuovere "${prod.nome}" dalla giacenza?`)) return;
+      state.products = state.products.filter(p=>p.id!==pid);
+      await saveState();
+      render();
+      showToast('Prodotto rimosso');
+    });
+  });
+
+  document.querySelectorAll('.editProd').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const tr = e.target.closest('tr');
+      const pid = tr.dataset.pid;
+      const prod = state.products.find(p=>p.id===pid);
+      modal = {type:'editQty', pid, nome: prod.nome, quantita: prod.quantita};
+      render();
+    });
+  });
+
+  const modalBg = document.getElementById('modalBg');
+  if(modalBg){
+    modalBg.addEventListener('click', (e)=>{
+      if(e.target.id==='modalBg'){ modal=null; render(); }
+    });
+    const cancelBtn = document.getElementById('modalCancel');
+    if(cancelBtn) cancelBtn.addEventListener('click', ()=>{ modal=null; render(); });
+
+    const confirmBtn = document.getElementById('modalConfirm');
+    if(confirmBtn) confirmBtn.addEventListener('click', async ()=>{
+      if(modal.type==='newCell'){
+        const name = document.getElementById('modalName').value.trim();
+        const temp = document.getElementById('modalTemp').value;
+        if(!name){ showToast('Inserisci un nome per la cella'); return; }
+        const newCell = { id: uid(), name, temp: temp===''?null:Number(temp) };
+        state.cells.push(newCell);
+        activeCellId = newCell.id;
+        modal = null;
+        await saveState();
+        render();
+        showToast('Cella creata');
+      } else if(modal.type==='renameCell'){
+        const name = document.getElementById('modalName').value.trim();
+        if(!name){ showToast('Il nome non può essere vuoto'); return; }
+        const cell = state.cells.find(c=>c.id===activeCellId);
+        cell.name = name;
+        modal = null;
+        await saveState();
+        render();
+        showToast('Cella rinominata');
+      } else if(modal.type==='editQty'){
+        const qty = document.getElementById('modalQty').value;
+        if(qty===''){ showToast('Inserisci una quantità'); return; }
+        const prod = state.products.find(p=>p.id===modal.pid);
+        prod.quantita = Number(qty);
+        modal = null;
+        await saveState();
+        render();
+        showToast('Quantità aggiornata');
+      }
+    });
+  }
+}
+
+loadState();
+</script>
+</body>
+</html>
